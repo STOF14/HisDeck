@@ -29,6 +29,11 @@ Then run:
 HisDeck
 ```
 
+Lowercase also works:
+```bash
+hisdeck
+```
+
 For local development, link the command:
 ```bash
 npm install
@@ -110,6 +115,12 @@ Token usage is an estimate based on prompt and reply length.
 - `npm start` - run the TUI
 - `npm run typecheck` - TypeScript type check
 - `npm run build` - build the CLI bundle
+
+## Publishing (maintainers)
+```bash
+npm login
+npm publish --access public
+```
 
 ## Project structure
 ```
