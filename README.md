@@ -1,6 +1,10 @@
-# Study TUI
+# HisDeck
 
 Pixel-art terminal study assistant with per-person setup and a Gemini-powered copilot.
+
+[![CI](https://github.com/STOF14/HisDeck/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/STOF14/HisDeck/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
 
 ## Features
 - First-run setup wizard for each user
@@ -14,6 +18,9 @@ Pixel-art terminal study assistant with per-person setup and a Gemini-powered co
 npm install
 npm start
 ```
+
+## Requirements
+- Node.js >= 18 (see .nvmrc)
 
 The first run opens a setup wizard that creates:
 - `~/.study-tui/config.json`
@@ -72,6 +79,12 @@ A full sample is in `examples/plan.sample.json`.
 }
 ```
 
+## Reset setup
+Delete the config file to rerun the wizard:
+```bash
+rm ~/.study-tui/config.json
+```
+
 ## Usage meter
 The dashboard shows estimated tokens and request usage for the current day.
 Token usage is an estimate based on prompt and reply length.
@@ -102,6 +115,9 @@ examples/
 
 ## Contributing
 See `CONTRIBUTING.md`.
+
+## Changelog
+See `CHANGELOG.md`.
 
 ## License
 MIT. See `LICENSE`.

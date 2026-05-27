@@ -1,7 +1,7 @@
 {
-  "name": "study-tui",
+  "name": "hisdeck",
   "version": "1.0.0",
-  "description": "Pixel-art study assistant TUI with per-user plans and Gemini copilot",
+  "description": "Pixel-art study assistant TUI with per-user plans and a Gemini copilot",
   "scripts": {
     "start": "tsx src/app.tsx",
     "typecheck": "tsc --noEmit"
@@ -17,6 +17,14 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/STOF14/HisDeck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/STOF14/HisDeck/issues"
+  },
+  "homepage": "https://github.com/STOF14/HisDeck#readme",
   "engines": {
     "node": ">=18"
   },
