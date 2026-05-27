@@ -19,6 +19,23 @@ npm install
 npm start
 ```
 
+## Global usage (run from anywhere)
+Install globally:
+```bash
+npm install -g hisdeck
+```
+Then run:
+```bash
+HisDeck
+```
+
+For local development, link the command:
+```bash
+npm install
+npm link
+HisDeck
+```
+
 ## Requirements
 - Node.js >= 18 (see .nvmrc)
 
@@ -92,6 +109,7 @@ Token usage is an estimate based on prompt and reply length.
 ## Scripts
 - `npm start` - run the TUI
 - `npm run typecheck` - TypeScript type check
+- `npm run build` - build the CLI bundle
 
 ## Project structure
 ```

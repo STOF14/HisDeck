@@ -4,7 +4,9 @@
   "description": "Pixel-art study assistant TUI with per-user plans and a Gemini copilot",
   "scripts": {
     "start": "tsx src/app.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build"
   },
   "keywords": [
     "cli",
@@ -17,6 +19,16 @@
   ],
   "author": "",
   "license": "MIT",
+  "bin": {
+    "HisDeck": "bin/HisDeck"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE",
+    "examples"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/STOF14/HisDeck.git"
