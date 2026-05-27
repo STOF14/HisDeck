@@ -1,0 +1,40 @@
+{
+  "name": "study-tui",
+  "version": "1.0.0",
+  "description": "Pixel-art study assistant TUI with per-user plans and Gemini copilot",
+  "scripts": {
+    "start": "tsx src/app.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "cli",
+    "tui",
+    "study",
+    "planner",
+    "gemini",
+    "ink",
+    "productivity"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.2.1",
+    "ink": "^6.8.0",
+    "ink-big-text": "^2.0.0",
+    "ink-select-input": "^6.2.0",
+    "ink-spinner": "^5.0.0",
+    "ink-text-input": "^6.0.0",
+    "react": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/node": "^24.3.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}

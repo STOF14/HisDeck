@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "planPath": "/home/user/.study-tui/plan.json",
+  "geminiApiKey": "YOUR_GEMINI_KEY",
+  "preferredModel": "gemini-2.5-flash",
+  "requestLimitPerDay": 1500,
+  "tokenLimitPerDay": 1000000
+}
