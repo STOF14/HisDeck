@@ -1,7 +1,9 @@
 import React from 'react';
 import { Box, Text, useStdout } from 'ink';
 
-export const THEME = {
+export const COLOR_ENABLED = !process.env.NO_COLOR && process.env.HISDECK_NO_COLOR !== '1';
+
+const BASE_THEME = {
   ink: '#1B2A3A',
   skyLight: '#A7D1F4',
   sky: '#7FB1E3',
@@ -13,7 +15,11 @@ export const THEME = {
   dim: '#6C7F99',
   text: '#EAF6FF',
   warn: '#F2B872',
-};
+} as const;
+
+export const THEME: Record<keyof typeof BASE_THEME, string | undefined> = Object.fromEntries(
+  Object.entries(BASE_THEME).map(([key, value]) => [key, COLOR_ENABLED ? value : undefined]),
+) as Record<keyof typeof BASE_THEME, string | undefined>;
 
 const SKY_BANDS = [
   { pattern: '.:..', color: THEME.skyLight },
@@ -83,17 +89,23 @@ export const PixelHeader = ({
 }) => {
   const columns = useTerminalWidth();
   const contentWidth = getContentWidth(columns);
+  const compact = contentWidth < 60;
+  const bands = compact ? SKY_BANDS.slice(0, 2) : SKY_BANDS;
 
   return (
     <Box flexDirection="column">
-      {SKY_BANDS.map((band, index) => (
+      {bands.map((band, index) => (
         <Text key={`${band.pattern}-${index}`} color={band.color}>
           {repeatToWidth(band.pattern, contentWidth)}
         </Text>
       ))}
-      <Text color={THEME.cloudDark}>{centerLine(CLOUD_LINE_1, contentWidth)}</Text>
-      <Text color={THEME.cloudMid}>{centerLine(CLOUD_LINE_2, contentWidth)}</Text>
-      <Text color={THEME.cloud}>{centerLine(CLOUD_LINE_3, contentWidth)}</Text>
+      {compact ? null : (
+        <>
+          <Text color={THEME.cloudDark}>{centerLine(CLOUD_LINE_1, contentWidth)}</Text>
+          <Text color={THEME.cloudMid}>{centerLine(CLOUD_LINE_2, contentWidth)}</Text>
+          <Text color={THEME.cloud}>{centerLine(CLOUD_LINE_3, contentWidth)}</Text>
+        </>
+      )}
       <Box marginTop={1}>
         <Text color={THEME.accent} bold>
           {title}

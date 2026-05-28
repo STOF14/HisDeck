@@ -5,7 +5,7 @@ import BigText from 'ink-big-text';
 import { Agent } from './screens/Agent.js';
 import { Dashboard } from './screens/Dashboard.js';
 import { Setup } from './screens/Setup.js';
-import { PixelHeader, PixelKey, THEME } from './lib/pixel.js';
+import { COLOR_ENABLED, PixelHeader, PixelKey, THEME } from './lib/pixel.js';
 import { getConfigPath, loadConfig, loadPlan, type AppConfig } from './lib/storage.js';
 import { loadUsage, type UsageDay } from './lib/usage.js';
 import type { StudyPlan } from './data/studyPlan.js';
@@ -30,8 +30,16 @@ const Splash = ({ plan, onDone }: { plan: StudyPlan; onDone: () => void }) => {
     <Box flexDirection="column" paddingX={2} paddingTop={1}>
       <PixelHeader title="STUDY PLAN" subtitle={subtitle} />
       <Box marginTop={1}>
-        <BigText text="STUDY" font="block" colors={[THEME.accent]} />
-        <BigText text="PLAN" font="block" colors={[THEME.accent]} />
+        <BigText
+          text="STUDY"
+          font="block"
+          colors={COLOR_ENABLED ? [THEME.accent ?? '#3E78B2'] : undefined}
+        />
+        <BigText
+          text="PLAN"
+          font="block"
+          colors={COLOR_ENABLED ? [THEME.accent ?? '#3E78B2'] : undefined}
+        />
       </Box>
       <Box marginTop={1}>
         <Text color={THEME.dim}>{examCount} exams  {daysLeft} days  press </Text>
@@ -60,23 +68,23 @@ const App = () => {
   useEffect(() => {
     const initialize = async () => {
       try {
+        if (process.env.HISDECK_FORCE_SETUP === '1') {
+          setStatus('setup');
+          return;
+        }
+
         const storedConfig = await loadConfig();
         if (!storedConfig) {
           setStatus('setup');
           return;
         }
 
-        const normalizedConfig: AppConfig = {
-          ...storedConfig,
-          requestLimitPerDay: storedConfig.requestLimitPerDay ?? 1500,
-          tokenLimitPerDay: storedConfig.tokenLimitPerDay ?? 1000000,
-        };
-        const storedPlan = await loadPlan(normalizedConfig.planPath);
+        const storedPlan = await loadPlan(storedConfig.planPath);
         const usageStore = await loadUsage();
         const todayKey = getLocalDateKey();
         const dayUsage = usageStore.days[todayKey] ?? { date: todayKey, requests: 0, tokens: 0 };
 
-        setConfig(normalizedConfig);
+        setConfig(storedConfig);
         setPlan(storedPlan);
         setUsageDay(dayUsage);
         setStatus('ready');
@@ -119,12 +127,7 @@ const App = () => {
     return (
       <Setup
         onComplete={(nextConfig, nextPlan) => {
-          const normalizedConfig: AppConfig = {
-            ...nextConfig,
-            requestLimitPerDay: nextConfig.requestLimitPerDay ?? 1500,
-            tokenLimitPerDay: nextConfig.tokenLimitPerDay ?? 1000000,
-          };
-          setConfig(normalizedConfig);
+          setConfig(nextConfig);
           setPlan(nextPlan);
           setUsageDay({ date: getLocalDateKey(), requests: 0, tokens: 0 });
           setStatus('ready');

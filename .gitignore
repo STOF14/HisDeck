@@ -5,3 +5,6 @@ node_modules
 .vscode
 *.log
 dist
+.tsbuildinfo
+coverage
+.env.local

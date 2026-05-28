@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Study TUI.
+Thanks for helping improve HisDeck.
 
 ## Development setup
 ```bash

@@ -12,17 +12,45 @@ export type AppConfig = {
   tokenLimitPerDay?: number;
 };
 
-const APP_DIR_NAME = '.study-tui';
+const APP_DIR_NAME = 'hisdeck';
+const DEFAULT_REQUEST_LIMIT = 1500;
+const DEFAULT_TOKEN_LIMIT = 1000000;
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 export function getAppDir(): string {
-  return path.join(os.homedir(), APP_DIR_NAME);
+  const override = process.env.HISDECK_HOME;
+  if (override && override.trim().length > 0) {
+    return override;
+  }
+
+  const xdg = process.env.XDG_CONFIG_HOME;
+  if (xdg && xdg.trim().length > 0) {
+    return path.join(xdg, APP_DIR_NAME);
+  }
+
+  const appData = process.env.APPDATA;
+  if (process.platform === 'win32' && appData && appData.trim().length > 0) {
+    return path.join(appData, 'HisDeck');
+  }
+
+  return path.join(os.homedir(), `.${APP_DIR_NAME}`);
 }
 
 export function getConfigPath(): string {
+  const override = process.env.HISDECK_CONFIG_PATH;
+  if (override && override.trim().length > 0) {
+    return override;
+  }
+
   return path.join(getAppDir(), 'config.json');
 }
 
 export function getDefaultPlanPath(): string {
+  const override = process.env.HISDECK_PLAN_PATH;
+  if (override && override.trim().length > 0) {
+    return override;
+  }
+
   return path.join(getAppDir(), 'plan.json');
 }
 
@@ -46,7 +74,9 @@ async function readJson<T>(filePath: string): Promise<T | null> {
 async function writeJson(filePath: string, data: unknown): Promise<void> {
   await ensureDir(path.dirname(filePath));
   const payload = `${JSON.stringify(data, null, 2)}\n`;
-  await fs.writeFile(filePath, payload, 'utf8');
+  const tempPath = `${filePath}.tmp-${Date.now()}`;
+  await fs.writeFile(tempPath, payload, 'utf8');
+  await fs.rename(tempPath, filePath);
 }
 
 function isNonEmptyString(value: unknown): value is string {
@@ -92,29 +122,102 @@ function isPlan(value: unknown): value is StudyPlan {
   );
 }
 
-function isConfig(value: unknown): value is AppConfig {
+function migrateConfig(value: unknown, configPath: string): AppConfig {
   if (!value || typeof value !== 'object') {
-    return false;
+    throw new Error(`Invalid config at ${configPath}`);
   }
 
-  const config = value as AppConfig;
+  const raw = value as Partial<AppConfig>;
+  const version = raw.version ?? 1;
 
-  return config.version === 1 && isNonEmptyString(config.planPath);
+  if (version !== 1) {
+    throw new Error(`Unsupported config version at ${configPath}`);
+  }
+
+  if (!raw.planPath) {
+    raw.planPath = getDefaultPlanPath();
+  }
+
+  if (!isNonEmptyString(raw.planPath)) {
+    throw new Error(`Invalid config at ${configPath}`);
+  }
+
+  return normalizeConfig({
+    version: 1,
+    planPath: raw.planPath,
+    geminiApiKey: raw.geminiApiKey,
+    preferredModel: raw.preferredModel,
+    requestLimitPerDay: raw.requestLimitPerDay,
+    tokenLimitPerDay: raw.tokenLimitPerDay,
+  });
+}
+
+function normalizeConfig(config: AppConfig): AppConfig {
+  return {
+    version: 1,
+    planPath: process.env.HISDECK_PLAN_PATH ?? config.planPath ?? getDefaultPlanPath(),
+    geminiApiKey: config.geminiApiKey,
+    preferredModel: config.preferredModel ?? DEFAULT_MODEL,
+    requestLimitPerDay: config.requestLimitPerDay ?? DEFAULT_REQUEST_LIMIT,
+    tokenLimitPerDay: config.tokenLimitPerDay ?? DEFAULT_TOKEN_LIMIT,
+  };
+}
+
+function validatePlan(plan: StudyPlan): string[] {
+  const errors: string[] = [];
+
+  if (!plan.profile || !isNonEmptyString(plan.profile.name)) {
+    errors.push('profile.name is required');
+  }
+
+  if (!Array.isArray(plan.rules) || !isStringArray(plan.rules)) {
+    errors.push('rules must be an array of strings');
+  }
+
+  if (!Array.isArray(plan.exams) || !plan.exams.every((exam) => isExam(exam))) {
+    errors.push('exams must be an array of exam objects');
+  }
+
+  if (!plan.schedule || typeof plan.schedule !== 'object') {
+    errors.push('schedule must be an object of date keys');
+  } else {
+    const scheduleValues = Object.values(plan.schedule);
+    if (!scheduleValues.every((entry) => isStringArray(entry))) {
+      errors.push('schedule entries must be string arrays');
+    }
+  }
+
+  return errors;
+}
+
+function normalizePlan(plan: StudyPlan, planPath: string): StudyPlan {
+  if (plan.version && plan.version !== 1) {
+    throw new Error(`Unsupported plan version at ${planPath}`);
+  }
+
+  return {
+    ...plan,
+    version: 1,
+    profile: {
+      name: plan.profile?.name ?? 'Student',
+      institution: plan.profile?.institution,
+      term: plan.profile?.term,
+    },
+    rules: plan.rules ?? [],
+    exams: plan.exams ?? [],
+    schedule: plan.schedule ?? {},
+  };
 }
 
 export async function loadConfig(): Promise<AppConfig | null> {
   const configPath = getConfigPath();
-  const config = await readJson<AppConfig>(configPath);
+  const config = await readJson<unknown>(configPath);
 
   if (!config) {
     return null;
   }
 
-  if (!isConfig(config)) {
-    throw new Error(`Invalid config at ${configPath}`);
-  }
-
-  return config;
+  return migrateConfig(config, configPath);
 }
 
 export async function saveConfig(config: AppConfig): Promise<void> {
@@ -132,7 +235,13 @@ export async function loadPlan(planPath: string): Promise<StudyPlan> {
     throw new Error(`Invalid plan format at ${planPath}`);
   }
 
-  return plan;
+  const normalized = normalizePlan(plan, planPath);
+  const errors = validatePlan(normalized);
+  if (errors.length > 0) {
+    throw new Error(`Invalid plan format at ${planPath}: ${errors.join(', ')}`);
+  }
+
+  return normalized;
 }
 
 export async function savePlan(plan: StudyPlan, planPath: string): Promise<void> {

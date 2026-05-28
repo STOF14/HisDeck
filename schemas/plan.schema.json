@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HisDeck Study Plan",
+  "type": "object",
+  "required": ["profile", "rules", "exams", "schedule"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "enum": [1]
+    },
+    "profile": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "institution": { "type": "string" },
+        "term": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "exams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["module", "date", "time", "venue", "credits"],
+        "properties": {
+          "module": { "type": "string" },
+          "date": { "type": "string" },
+          "time": { "type": "string" },
+          "venue": { "type": "string" },
+          "credits": { "type": "number" },
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "patternProperties": {
+        "^\\d{4}-\\d{2}-\\d{2}$": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

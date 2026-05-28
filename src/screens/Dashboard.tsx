@@ -37,6 +37,8 @@ export const Dashboard = ({
   const tokensLeft = Math.max(0, tokenLimit - usage.tokens);
   const requestBar = buildBar(requestsLeft, requestLimit, 12);
   const tokenBar = buildBar(tokensLeft, tokenLimit, 12);
+  const aiEnabled = process.env.HISDECK_NO_AI !== '1' && (config.geminiApiKey ?? process.env.GEMINI_API_KEY);
+  const aiStatus = aiEnabled ? 'online' : 'offline';
 
   useInput((input) => {
     if (input === 'a') {
@@ -134,6 +136,8 @@ export const Dashboard = ({
         <Text color={THEME.text}>{nextExam ? nextExam.module : 'none'}</Text>
         <Text color={THEME.dim}>  DAYS </Text>
         <Text color={THEME.text}>{nextExam ? String(daysLeft) : '-'}</Text>
+        <Text color={THEME.dim}>  AI </Text>
+        <Text color={THEME.text}>{aiStatus}</Text>
       </Box>
 
       <Box marginTop={1} flexDirection={compact ? 'column' : 'row'}>

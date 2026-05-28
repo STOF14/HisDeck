@@ -26,12 +26,12 @@ npm install -g hisdeck
 ```
 Then run:
 ```bash
-HisDeck
+hisdeck
 ```
 
 Lowercase also works:
 ```bash
-hisdeck
+HisDeck
 ```
 
 For local development, link the command:
@@ -41,12 +41,23 @@ npm link
 HisDeck
 ```
 
+CLI options:
+```bash
+hisdeck init
+hisdeck --config /path/to/config.json
+hisdeck --reset
+hisdeck --no-ai
+hisdeck --help
+```
+
 ## Requirements
 - Node.js >= 18 (see .nvmrc)
 
 The first run opens a setup wizard that creates:
-- `~/.study-tui/config.json`
-- `~/.study-tui/plan.json`
+- `~/.hisdeck/config.json`
+- `~/.hisdeck/plan.json`
+
+On Linux, `XDG_CONFIG_HOME` is respected. On Windows, `%APPDATA%/HisDeck` is used.
 
 ## Setup wizard
 The wizard asks for:
@@ -62,6 +73,8 @@ If you skip the API key, the assistant runs in offline mode using local logic.
 Plans are plain JSON. Example:
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/STOF14/HisDeck/main/schemas/plan.schema.json",
+  "version": 1,
   "profile": {
     "name": "Sample Student",
     "institution": "Sample University",
@@ -87,13 +100,14 @@ Plans are plain JSON. Example:
 ```
 
 A full sample is in `examples/plan.sample.json`.
+Schema: `schemas/plan.schema.json`.
 
 ## Config format
-`~/.study-tui/config.json` controls runtime options:
+`~/.hisdeck/config.json` controls runtime options:
 ```json
 {
   "version": 1,
-  "planPath": "/home/user/.study-tui/plan.json",
+  "planPath": "/home/user/.hisdeck/plan.json",
   "geminiApiKey": "YOUR_KEY",
   "preferredModel": "gemini-2.5-flash",
   "requestLimitPerDay": 1500,
@@ -101,20 +115,47 @@ A full sample is in `examples/plan.sample.json`.
 }
 ```
 
+Environment overrides:
+- `HISDECK_HOME` to set the data directory
+- `HISDECK_CONFIG_PATH` to point to a custom config file
+- `HISDECK_PLAN_PATH` to override the default plan path
+- `HISDECK_NO_AI=1` to force offline mode
+
 ## Reset setup
 Delete the config file to rerun the wizard:
 ```bash
-rm ~/.study-tui/config.json
+rm ~/.hisdeck/config.json
 ```
 
 ## Usage meter
 The dashboard shows estimated tokens and request usage for the current day.
 Token usage is an estimate based on prompt and reply length.
 
+## FAQ
+**Where is my data stored?**
+All data is stored locally in your app data directory.
+
+**Does it work offline?**
+Yes. If no API key is provided, the assistant runs in offline mode with local logic.
+
+**How do I reset setup?**
+Delete the config file and relaunch the app to rerun the wizard.
+
+**How are tokens counted?**
+Tokens are estimated from prompt + reply length and shown as an approximate meter.
+
+**What happens to my API key?**
+Keys are stored locally in your config file or environment and are never committed.
+
+## Screenshots
+Add terminal screenshots in a future release (suggested path: `docs/screenshot.png`).
+
 ## Scripts
 - `npm start` - run the TUI
 - `npm run typecheck` - TypeScript type check
 - `npm run build` - build the CLI bundle
+- `npm run lint` - lint the codebase
+- `npm run test` - run unit tests
 
 ## Publishing (maintainers)
 ```bash

@@ -1,2 +1,15 @@
 #!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const baseDir = path.dirname(fileURLToPath(import.meta.url));
+const distPath = path.join(baseDir, '..', 'dist', 'cli.js');
+
+if (!fs.existsSync(distPath)) {
+	console.error('[HisDeck] Missing build output.');
+	console.error('[HisDeck] Run "npm run build" in the repo or reinstall the package.');
+	process.exit(1);
+}
+
 import '../dist/cli.js';

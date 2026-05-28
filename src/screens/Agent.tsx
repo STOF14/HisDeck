@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Text } from 'ink';
 import Spinner from 'ink-spinner';
 import TextInput from 'ink-text-input';
@@ -10,11 +10,9 @@ import type { StudyPlan } from '../data/studyPlan.js';
 import type { AppConfig } from '../lib/storage.js';
 import { estimateTokens, recordUsage, type UsageDay } from '../lib/usage.js';
 import { getLocalDateKey } from '../data/studyPlan.js';
+import { loadHistory, saveHistory, type ChatMessage } from '../lib/history.js';
 
-type Message = {
-  role: 'user' | 'agent';
-  text: string;
-};
+type Message = ChatMessage;
 
 export const Agent = ({
   plan,
@@ -30,13 +28,47 @@ export const Agent = ({
   const columns = useTerminalWidth();
   const compact = columns < 100;
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'agent', text: 'Personal study assistant ready. Ask for plans, reminders, or explanations.' },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const aiDisabled = process.env.HISDECK_NO_AI === '1';
   const [mode, setMode] = useState<'online' | 'offline'>(
-    config.geminiApiKey ?? process.env.GEMINI_API_KEY ? 'online' : 'offline',
+    !aiDisabled && (config.geminiApiKey ?? process.env.GEMINI_API_KEY) ? 'online' : 'offline',
   );
+
+  useEffect(() => {
+    let active = true;
+    loadHistory()
+      .then((history) => {
+        if (!active) {
+          return;
+        }
+        if (history.length > 0) {
+          setMessages(history);
+        } else {
+          setMessages([
+            { role: 'agent', text: 'Personal study assistant ready. Ask for plans, reminders, or explanations.' },
+          ]);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setMessages([
+            { role: 'agent', text: 'Personal study assistant ready. Ask for plans, reminders, or explanations.' },
+          ]);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      return;
+    }
+    void saveHistory(messages);
+  }, [messages]);
 
   const handleSubmit = async (value: string) => {
     const trimmed = value.trim();
@@ -55,7 +87,7 @@ export const Agent = ({
     setLoading(true);
 
     try {
-      const apiKey = config.geminiApiKey ?? process.env.GEMINI_API_KEY;
+      const apiKey = aiDisabled ? undefined : config.geminiApiKey ?? process.env.GEMINI_API_KEY;
       const systemPrompt = buildSystemPrompt(plan);
 
       if (apiKey) {
@@ -73,7 +105,7 @@ export const Agent = ({
         setMode('offline');
         setMessages((previous) => [...previous, { role: 'agent', text: answerLocally(trimmed, plan) }]);
       }
-    } catch (error) {
+    } catch {
       setMode('offline');
       const fallback = answerLocally(trimmed, plan);
       setMessages((previous) => [...previous, { role: 'agent', text: fallback }]);
@@ -105,8 +137,8 @@ export const Agent = ({
               </Text>
             </Box>
             <Text color={THEME.text}>What do I study today?</Text>
-              <Text color={THEME.text}>Build my evening routine</Text>
-              <Text color={THEME.text}>Summarize Fourier series in 3 lines</Text>
+            <Text color={THEME.text}>Build my evening routine</Text>
+            <Text color={THEME.text}>Summarize Fourier series in 3 lines</Text>
             <Text color={THEME.text}>How many days till COS 212?</Text>
           </Panel>
         </Box>

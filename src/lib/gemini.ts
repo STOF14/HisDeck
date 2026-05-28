@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI, type ChatSession } from '@google/generative-ai';
 
-const MODEL_CANDIDATES = [
+export const MODEL_CANDIDATES = [
   'gemini-2.5-flash',
   'gemini-2.0-flash',
   'gemini-2.0-flash-lite',
   'gemini-flash-latest',
   'gemini-flash-lite-latest',
-];
+] as const;
 
 type GeminiOptions = {
   apiKey: string;
@@ -66,7 +66,7 @@ function isRetryableModelError(error: unknown): boolean {
 
 function getModelList(preferredModel?: string): string[] {
   if (!preferredModel) {
-    return MODEL_CANDIDATES;
+    return [...MODEL_CANDIDATES];
   }
 
   return [preferredModel, ...MODEL_CANDIDATES.filter((model) => model !== preferredModel)];
@@ -113,4 +113,30 @@ export async function askGemini(prompt: string, options: GeminiOptions): Promise
   throw lastError instanceof Error
     ? new Error(`Gemini is unavailable right now: ${lastError.message}`)
     : new Error('Gemini is unavailable right now.');
+}
+
+export async function* askGeminiStream(
+  prompt: string,
+  options: GeminiOptions,
+): AsyncGenerator<string, void, void> {
+  type StreamChunk = { text: () => string };
+  type StreamResult = { stream: AsyncIterable<StreamChunk> };
+  type StreamChat = { sendMessageStream: (value: string) => Promise<StreamResult> };
+
+  for (const modelName of getModelList(options.preferredModel)) {
+    try {
+      const chat = getChat(options.apiKey, modelName, options.systemPrompt);
+      const result = await (chat as StreamChat).sendMessageStream(prompt);
+      for await (const chunk of result.stream) {
+        yield chunk.text();
+      }
+      return;
+    } catch (error) {
+      if (!isRetryableModelError(error)) {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error('Gemini streaming is unavailable right now.');
 }

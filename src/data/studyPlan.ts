@@ -14,6 +14,7 @@ export type StudyProfile = {
 };
 
 export type StudyPlan = {
+  version?: 1;
   profile: StudyProfile;
   rules: string[];
   exams: Exam[];
@@ -21,6 +22,7 @@ export type StudyPlan = {
 };
 
 export const DEFAULT_PLAN: StudyPlan = {
+  version: 1,
   profile: {
     name: 'Sample Student',
     institution: 'Sample University',
@@ -29,38 +31,18 @@ export const DEFAULT_PLAN: StudyPlan = {
   rules: [
     '3 blocks per day, about 2 hours each',
     '50 min on / 10 min break',
-    'The module with the next exam gets Block 1 every day',
-    'PHY 255 always appears because it has two papers',
-    'Max 2 hours per module per session',
+    'Module with the next exam gets Block 1',
     'Sleep 7-8 hours; non-negotiable',
-    'Hard stop by 20:00 on nights before 07:30 exams',
   ],
   exams: [
-    { module: 'WTW 211', date: '2026-06-01', time: '15:00', venue: 'Roos Hall', credits: 12 },
-    { module: 'PHY 255 P1', date: '2026-06-03', time: '11:15', venue: 'NS1 5-42', credits: 24 },
-    { module: 'COS 210', date: '2026-06-05', time: '07:30', venue: 'IT Building CBT Labs', credits: 8 },
-    { module: 'COS 212', date: '2026-06-08', time: '11:15', venue: 'Large Chemistry Hall', credits: 16, notes: 'Open book' },
-    { module: 'PHY 255 P2', date: '2026-06-10', time: '07:30', venue: 'NS1 5-42', credits: 24 },
-    { module: 'WTW 218', date: '2026-06-13', time: '07:30', venue: 'Thuto 1-1', credits: 12 },
+    { module: 'MATH 101', date: '2026-06-01', time: '09:00', venue: 'Main Hall', credits: 12 },
+    { module: 'PHYS 101', date: '2026-06-05', time: '13:30', venue: 'Science Building', credits: 12 },
+    { module: 'CS 101', date: '2026-06-09', time: '08:00', venue: 'Lab A', credits: 16 },
   ],
   schedule: {
-    '2026-05-28': ['WTW 211', 'PHY 255', 'COS 210'],
-    '2026-05-29': ['WTW 211', 'COS 212', 'PHY 255'],
-    '2026-05-30': ['WTW 211', 'WTW 218', 'COS 210'],
-    '2026-05-31': ['WTW 211', 'PHY 255', 'COS 212'],
-    '2026-06-01': ['WTW 211 final prep', 'WTW 211 exam 15:00', 'PHY 255'],
-    '2026-06-02': ['PHY 255 P1', 'PHY 255 P1', 'COS 210'],
-    '2026-06-03': ['PHY 255 P1 exam 11:15', 'REST', 'PHY 255 P2 light'],
-    '2026-06-04': ['COS 210', 'COS 210', 'PHY 255 P2'],
-    '2026-06-05': ['COS 210 exam 07:30', 'REST', 'COS 212'],
-    '2026-06-06': ['COS 212', 'PHY 255 P2', 'WTW 218'],
-    '2026-06-07': ['COS 212', 'PHY 255 P2', 'WTW 218'],
-    '2026-06-08': ['COS 212 exam 11:15', 'REST', 'PHY 255 P2'],
-    '2026-06-09': ['PHY 255 P2', 'PHY 255 P2', 'WTW 218'],
-    '2026-06-10': ['PHY 255 P2 exam 07:30', 'REST', 'WTW 218'],
-    '2026-06-11': ['WTW 218', 'WTW 218', 'WTW 218'],
-    '2026-06-12': ['WTW 218', 'WTW 218', 'REST'],
-    '2026-06-13': ['WTW 218 exam 07:30', '—', '—'],
+    '2026-05-28': ['MATH 101', 'PHYS 101', 'CS 101'],
+    '2026-05-29': ['MATH 101', 'PHYS 101', 'CS 101'],
+    '2026-05-30': ['MATH 101', 'PHYS 101', 'CS 101'],
   },
 };
 

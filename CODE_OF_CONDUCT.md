@@ -10,3 +10,6 @@ We expect all contributors and users to treat each other with respect.
 ## Enforcement
 If you experience or witness unacceptable behavior, open a private issue or
 reach out to the maintainers. We will review and respond promptly.
+
+## Maintainer contact
+GitHub: https://github.com/STOF14

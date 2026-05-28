@@ -42,6 +42,20 @@ export function answerLocally(prompt: string, plan: StudyPlan): string {
     return `STATUS: tomorrow schedule\nNEXT: ${schedule.join(' | ')}`;
   }
 
+  if (lowered.includes('rules') || lowered.includes('plan rules')) {
+    return `STATUS: plan rules\nDETAIL: ${plan.rules.join(' | ')}`;
+  }
+
+  if (lowered.includes('exams') || lowered.includes('exam list')) {
+    const list = plan.exams.map((exam) => `${exam.module} ${exam.date}`).join(' | ');
+    return `STATUS: exam list\nDETAIL: ${list}`;
+  }
+
+  if (lowered.includes('modules') || lowered.includes('subjects')) {
+    const list = plan.exams.map((exam) => exam.module).join(' | ');
+    return `STATUS: modules\nDETAIL: ${list}`;
+  }
+
   if (lowered.includes('today') || lowered.includes('study') || lowered.includes('block')) {
     const schedule = getTodaySchedule(plan);
     return `STATUS: ${getLocalDateKey()} schedule\nNEXT: ${schedule.join(' | ')}`;

@@ -23,3 +23,5 @@ about: Report a bug to help us improve
 ```
 Paste any relevant logs here.
 ```
+
+Maintainer: https://github.com/STOF14

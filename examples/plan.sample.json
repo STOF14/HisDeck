@@ -1,4 +1,6 @@
 {
+  "$schema": "https://raw.githubusercontent.com/STOF14/HisDeck/main/schemas/plan.schema.json",
+  "version": 1,
   "profile": {
     "name": "Sample Student",
     "institution": "Sample University",

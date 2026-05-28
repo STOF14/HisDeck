@@ -11,3 +11,5 @@ about: Suggest an idea or improvement
 
 ## Alternatives considered
 
+Maintainer: https://github.com/STOF14
+

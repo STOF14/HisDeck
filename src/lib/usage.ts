@@ -39,7 +39,9 @@ async function readJson<T>(filePath: string): Promise<T | null> {
 async function writeJson(filePath: string, data: unknown): Promise<void> {
   await ensureDir(path.dirname(filePath));
   const payload = `${JSON.stringify(data, null, 2)}\n`;
-  await fs.writeFile(filePath, payload, 'utf8');
+  const tempPath = `${filePath}.tmp-${Date.now()}`;
+  await fs.writeFile(tempPath, payload, 'utf8');
+  await fs.rename(tempPath, filePath);
 }
 
 export async function loadUsage(): Promise<UsageStore> {

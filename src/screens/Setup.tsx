@@ -4,6 +4,7 @@ import SelectInput from 'ink-select-input';
 import TextInput from 'ink-text-input';
 import { applyProfile, DEFAULT_PLAN, type StudyPlan } from '../data/studyPlan.js';
 import { PixelDivider, PixelHeader, PixelKey, THEME } from '../lib/pixel.js';
+import { MODEL_CANDIDATES } from '../lib/gemini.js';
 import {
   getConfigPath,
   getDefaultPlanPath,
@@ -19,6 +20,7 @@ type Step =
   | 'institution'
   | 'term'
   | 'apiKey'
+  | 'model'
   | 'planChoice'
   | 'planPath'
   | 'saving'
@@ -38,6 +40,7 @@ export const Setup = ({ onComplete }: { onComplete: (config: AppConfig, plan: St
   const [institution, setInstitution] = useState('');
   const [term, setTerm] = useState('');
   const [apiKey, setApiKey] = useState('');
+  const [preferredModel, setPreferredModel] = useState<string>(MODEL_CANDIDATES[0]);
   const [planPath, setPlanPath] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [savedConfig, setSavedConfig] = useState<AppConfig | null>(null);
@@ -68,7 +71,7 @@ export const Setup = ({ onComplete }: { onComplete: (config: AppConfig, plan: St
         version: 1,
         planPath: targetPath,
         geminiApiKey: apiKey.trim() || undefined,
-        preferredModel: 'gemini-2.5-flash',
+        preferredModel,
         requestLimitPerDay: 1500,
         tokenLimitPerDay: 1000000,
       };
@@ -180,7 +183,25 @@ export const Setup = ({ onComplete }: { onComplete: (config: AppConfig, plan: St
           <Text color={THEME.dim}>Leave blank to use offline mode.</Text>
           <Box marginTop={1}>
             <Text color={THEME.accent}>&gt; </Text>
-            <TextInput value={apiKey} onChange={setApiKey} onSubmit={() => setStep('planChoice')} />
+            <TextInput value={apiKey} onChange={setApiKey} onSubmit={() => setStep('model')} />
+          </Box>
+        </Box>
+      )}
+
+      {step === 'model' && (
+        <Box flexDirection="column" marginTop={1}>
+          <Text color={THEME.accent} bold>
+            Preferred model
+          </Text>
+          <Text color={THEME.dim}>Used when AI is enabled. Default is fine.</Text>
+          <Box marginTop={1}>
+            <SelectInput
+              items={MODEL_CANDIDATES.map((model) => ({ label: model, value: model }))}
+              onSelect={(item) => {
+                setPreferredModel(item.value);
+                setStep('planChoice');
+              }}
+            />
           </Box>
         </Box>
       )}
