@@ -126,6 +126,7 @@ export const Dashboard = ({
       <PixelHeader
         title="STUDY PLAN"
         subtitle={`${plan.profile.name}${plan.profile.institution ? `  ${plan.profile.institution}` : ''}${plan.profile.term ? `  ${plan.profile.term}` : ''}`}
+        variant="serious"
       />
       <PixelDivider tone="light" />
 

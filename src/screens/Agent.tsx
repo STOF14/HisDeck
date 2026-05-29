@@ -116,14 +116,33 @@ export const Agent = ({
 
   const visibleMessages = messages.slice(-6);
 
+  const renderAgentLine = (line: string) => {
+    const labelMatch = /^(PLAN|CONTEXT|ACTIONS|NEXT|ASK):\s*/.exec(line);
+    if (!labelMatch) {
+      return <Text color={THEME.text}>{line}</Text>;
+    }
+
+    const label = labelMatch[1];
+    const rest = line.slice(labelMatch[0].length);
+    return (
+      <Text>
+        <Text color={THEME.accent} bold>
+          {label}:
+        </Text>
+        <Text color={THEME.text}> {rest}</Text>
+      </Text>
+    );
+  };
+
   return (
     <Box flexDirection="column" paddingX={2} paddingTop={1}>
-      <PixelHeader title="PERSONAL ASSISTANT" subtitle={`mode: ${mode}  command /back`} />
+      <PixelHeader title="PERSONAL ASSISTANT" subtitle={`mode: ${mode}  command /back`} variant="playful" />
 
       <Box marginTop={1} flexDirection={compact ? 'column' : 'row'}>
         <Box flexDirection="column" width={compact ? undefined : 34}>
           <Panel title="Scope">
             <Text color={THEME.text}>Plans, routines, schedules, explanations</Text>
+            <Text color={THEME.dim}>Claude-style flow: Plan, Context, Actions</Text>
             <Text color={THEME.dim}>No answers for graded assessments</Text>
             <Box marginTop={1}>
               <Text color={THEME.accent} bold>
@@ -148,10 +167,16 @@ export const Agent = ({
             {visibleMessages.map((message, index) => (
               <Box key={`${message.role}-${index}`} marginBottom={1}>
                 <Text color={message.role === 'user' ? THEME.accent : THEME.cloudDark} bold>
-                  {message.role === 'user' ? 'YOU' : 'ADMIN'}
+                  {message.role === 'user' ? 'YOU' : 'ASSIST'}
                 </Text>
                 <Text color={THEME.dim}> | </Text>
-                <Text color={THEME.text}>{message.text}</Text>
+                <Box flexDirection="column">
+                  {message.text.split('\n').map((line, lineIndex) => (
+                    <Box key={`${index}-${lineIndex}`}>
+                      {message.role === 'agent' ? renderAgentLine(line) : <Text color={THEME.text}>{line}</Text>}
+                    </Box>
+                  ))}
+                </Box>
               </Box>
             ))}
             {loading ? (

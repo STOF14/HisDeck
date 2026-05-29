@@ -65,9 +65,17 @@ The wizard asks for:
 - Institution (optional)
 - Term label (optional)
 - Gemini API key (optional)
-- Plan source (sample plan or import JSON)
+- Plan source (sample plan, import JSON, paste text, or guided)
 
 If you skip the API key, the assistant runs in offline mode using local logic.
+
+Plan sources:
+- Sample plan: quick demo data.
+- Import JSON: load an existing plan file.
+- Paste text: drop any format (including markdown) and the AI extracts exams, rules, and schedules.
+- Guided setup: answer 1-3 short questions and the AI builds the plan in the background. You can type `/done` without pasting anything to use this.
+
+The paste and guided options need a Gemini API key to parse text and create the plan.
 
 ## Plan format
 Plans are plain JSON. Example:
@@ -137,6 +145,9 @@ All data is stored locally in your app data directory.
 
 **Does it work offline?**
 Yes. If no API key is provided, the assistant runs in offline mode with local logic.
+
+**Do I have to write JSON?**
+No. Use the paste or guided setup options to generate a plan from natural text. Import JSON is only for advanced users.
 
 **How do I reset setup?**
 Delete the config file and relaunch the app to rerun the wizard.

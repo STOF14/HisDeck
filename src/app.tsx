@@ -33,12 +33,12 @@ const Splash = ({ plan, onDone }: { plan: StudyPlan; onDone: () => void }) => {
         <BigText
           text="STUDY"
           font="block"
-          colors={COLOR_ENABLED ? [THEME.accent ?? '#3E78B2'] : undefined}
+          colors={COLOR_ENABLED ? [THEME.accent ?? '#3A6EA5'] : undefined}
         />
         <BigText
           text="PLAN"
           font="block"
-          colors={COLOR_ENABLED ? [THEME.accent ?? '#3E78B2'] : undefined}
+          colors={COLOR_ENABLED ? [THEME.accent ?? '#3A6EA5'] : undefined}
         />
       </Box>
       <Box marginTop={1}>
